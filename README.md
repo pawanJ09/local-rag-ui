@@ -3,7 +3,50 @@
 React + TypeScript web client for `local-rag-backend`. It only talks to the
 backend's REST API. It never touches Ollama or Chroma.
 
-## Run it (Docker, the way most people will)
+## Which way should I run it?
+
+| I want to... | Use | Needs | Opens at |
+|---|---|---|---|
+| Just use the app | **Docker** (below) | Docker only | http://localhost:3000 |
+| Change the UI code | **Develop** (further down) | Node.js 20+ | http://localhost:5173 |
+
+Both read the same two settings, `API_BASE_URL` and `API_KEY`.
+
+## Run it with Docker
+
+### Before you start (both options)
+
+The backend must allow the address you open the UI at. In the backend's `.env`
+set `ALLOWED_ORIGINS=http://localhost:3000` and run `docker compose up -d`.
+Otherwise the browser blocks the requests and the UI shows
+"Cannot reach the backend".
+
+### Option A: build it yourself from this repo (works today)
+
+Use this until the image has been published to ghcr.io.
+
+1. Copy the settings file and edit it:
+   ```bash
+   cp .env.example .env
+   ```
+   Set `API_BASE_URL` (where the backend is, usually `http://localhost:8000`)
+   and `API_KEY` (the same value as the backend's `API_KEY`).
+2. Build the image:
+   ```bash
+   make docker-build
+   ```
+3. Start it:
+   ```bash
+   make docker-run
+   ```
+4. Open http://localhost:3000. Stop it with Ctrl+C.
+
+`make docker-run` reads `API_BASE_URL` and `API_KEY` from your `.env`.
+
+### Option B: use the published image
+
+This only works after the GitHub build workflow has run and the package has
+been made public (GitHub → Packages → Package settings → Change visibility).
 
 ```bash
 docker run --rm -p 3000:80 \
@@ -14,16 +57,12 @@ docker run --rm -p 3000:80 \
 
 Open http://localhost:3000.
 
-The backend must allow that address. In the backend's `.env` set
-`ALLOWED_ORIGINS=http://localhost:3000` and run `docker compose up -d`.
-Otherwise the browser blocks the requests and the UI shows
-"Cannot reach the backend".
-
 `API_BASE_URL` and `API_KEY` are read when the container starts, not baked into
-the image, so one published image works for everyone. The same two settings are
-used by `make dev` (from `.env`), so there is only one pair of names to remember.
+the image, so one published image works for everyone.
 
-## Develop
+## Develop (only if you are changing the UI code)
+
+Needs Node.js 20 or newer.
 
 ```bash
 cp .env.example .env     # API_BASE_URL and API_KEY (same names as Docker)
