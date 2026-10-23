@@ -1,5 +1,8 @@
 # ---- build stage ----
-FROM node:20-alpine AS build
+# Always runs on the build machine's own chip (BUILDPLATFORM), even when the image
+# is being built for another one. The output is plain HTML/JS/CSS, which is the
+# same for every platform, so there is no need to run npm under emulation.
+FROM --platform=$BUILDPLATFORM node:20-alpine AS build
 WORKDIR /app
 COPY package*.json ./
 # Uses the lockfile when present (reproducible); falls back to npm install.
